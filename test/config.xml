@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit bootstrap="Bootstrap.php" 
+>
+    <testsuites>
+        <testsuite name="Imperium">
+            <directory>Imperium</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>
+            <directory suffix=".php">../lib</directory>
+        </whitelist>
+    </filter>
+    <logging>
+        <log type="coverage-html" target="../html" yui="true" />
+        <log type="testdox-html" target="../html/testdox.html"/>
+    </logging>
+</phpunit>
