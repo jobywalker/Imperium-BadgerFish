@@ -110,16 +110,31 @@ class BadgerFish
         return $return;
     }
 
+    /**
+     * Convert JSON serialization into XML
+     * @param string $json
+     * @return string
+     */
     public static function jsonToXml($json)
     {
         return self::phpToXml(json_decode($json, false));
     }
 
+    /**
+     * Convert a PHP datastructure into a Valid XML document
+     * @param mixed $php
+     * @return string
+     */
     public static function phpToXml($php)
     {
         return self::phpToSXE($php)->asXML();
     }
 
+    /**
+     * Convert a PHP datastructure into a SimpleXMLElement structure
+     * @param mixed $php
+     * @return SimpleXMLElement
+     */
     public static function phpToSXE($php)
     {
         if (\is_object($php)) {
@@ -137,9 +152,14 @@ class BadgerFish
         return $sxe;
     }
 
+    /**
+     * Recursively transform PHP datastructure into a SimpleXMLElement
+     * @param mixed $data
+     * @param \SimpleXMLElement $sxe
+     * @param mixed $field
+     */
     public static function debadger($data, \SimpleXMLElement $sxe, $field = null)
     {
-        print_r(array($data, $sxe, $field));
         if (\is_object($data) || (\is_array($data) && \array_keys($data) !== range(0,count($data)-1))) {
             $data = (array)$data;
             if ($field) {
@@ -155,8 +175,6 @@ class BadgerFish
                 self::debadger($value, $c, $key);
             }
         } elseif ($field == null) {
-            #echo __METHOD__.__LINE__.$field;
-            #print_r($data);
             throw new \Exception('Invalid processing');
         } elseif (\is_array($data)) {
             foreach ($data as $value) {
@@ -173,6 +191,12 @@ class BadgerFish
         }
     }
 
+    /**
+     * Add the string value as a child or attribute of the SimpleXMLElement
+     * @param string $string
+     * @param \SimpleXMLElement $sxe
+     * @param string $field
+     */
     public static function addString($string, \SimpleXMLElement $sxe, $field)
     {
         if (preg_match('/^@/', $field)) {
