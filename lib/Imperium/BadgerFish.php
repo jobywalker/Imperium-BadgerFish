@@ -88,7 +88,11 @@ class BadgerFish
             } else {
                 $return['$'] = self::badgerfy((string)$data);
             }
-        } elseif (is_array($data)) {
+        } elseif (\is_object($data)) {
+            foreach((array)$data as $key => $value) {
+                $return[$key] = self::badgerfy($value);
+            }
+        } elseif (\is_array($data)) {
             foreach ($data as $key => $value) {
                 $return[$key] = self::badgerfy($value);
             }
@@ -104,5 +108,81 @@ class BadgerFish
             }
         }
         return $return;
+    }
+
+    public static function jsonToXml($json)
+    {
+        return self::phpToXml(json_decode($json, false));
+    }
+
+    public static function phpToXml($php)
+    {
+        return self::phpToSXE($php)->asXML();
+    }
+
+    public static function phpToSXE($php)
+    {
+        if (\is_object($php)) {
+            $php = (array)$php;
+        }
+        if (!\is_array($php) || count($php)!==1) {
+            throw new \Exception('Data is not properly formatted for generating XML root');
+        }
+        list($root) = \array_keys($php);
+        $sxe = \simplexml_load_string("<$root/>", 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NOERROR);
+        if (!($sxe instanceof \SimpleXMLElement)) {
+            throw new \Exception('Can not be created as XML');
+        }
+        self::debadger($php[$root], $sxe);
+        return $sxe;
+    }
+
+    public static function debadger($data, \SimpleXMLElement $sxe, $field = null)
+    {
+        print_r(array($data, $sxe, $field));
+        if (\is_object($data) || (\is_array($data) && \array_keys($data) !== range(0,count($data)-1))) {
+            $data = (array)$data;
+            if ($field) {
+                if(isset($data['$'])) {
+                    $c = $sxe->addChild($field, $data['$']);
+                } else {
+                    $c = $sxe->addChild($field);
+                }
+            } else {
+                $c = $sxe;
+            }
+            foreach((array)$data as $key => $value) {
+                self::debadger($value, $c, $key);
+            }
+        } elseif ($field == null) {
+            #echo __METHOD__.__LINE__.$field;
+            #print_r($data);
+            throw new \Exception('Invalid processing');
+        } elseif (\is_array($data)) {
+            foreach ($data as $value) {
+                self::debadger($value, $sxe, $field);
+            }
+        } elseif ($data === true) {
+            self::addString('true', $sxe, $field);
+        } elseif ($data === false) {
+            self::addString('false', $sxe, $field);
+        } elseif ($data) {
+            self::addString("$data", $sxe, $field);
+        } else {
+            self::addString('', $sxe, $field);
+        }
+    }
+
+    public static function addString($string, \SimpleXMLElement $sxe, $field)
+    {
+        if (preg_match('/^@/', $field)) {
+            $sxe->addAttribute(\mb_substr($field, 1), $string);
+        } else {
+            if ($string) {
+                $sxe->addChild($field, $string);
+            } else {
+                $sxe->addChild($field);
+            }
+        }
     }
 }
