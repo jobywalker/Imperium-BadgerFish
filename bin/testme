@@ -1,0 +1,5 @@
+#!/usr/bin/env php
+<?php
+exec('rm '.__DIR__.'/../html/* 2>&1');
+chdir(__DIR__.'/../test');
+passthru('phpunit --configuration config.xml --verbose');
