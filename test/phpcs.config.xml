@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : phpcs.config.xml
+    Created on : March 18, 2011, 12:56 PM
+    Author     : Joby Walker <joby@imperium.org>
+    Description:
+        PHP CodeSniffer Configuration
+-->
+<ruleset name="Imperium">
+ <description>Configuration of Imperium libraries</description>
+ <exclude-pattern>*/Tests/*</exclude-pattern>
+
+ <!-- Include the whole PEAR standard -->
+ <rule ref="PEAR"/>
+
+ <!-- We do not require newlines after @params -->
+ <rule ref="PEAR.Commenting.FunctionComment.SpacingAfterParams">
+     <severity>0</severity>
+ </rule>
+
+ <!-- Lines can be 100 chars long, show errors at 110 chars -->
+ <rule ref="Generic.Files.LineLength">
+  <properties>
+   <property name="lineLimit" value="100"/>
+   <property name="absoluteLineLimit" value="120"/>
+  </properties>
+ </rule>
+
+ <!-- Use Unix newlines -->
+ <rule ref="Generic.Files.LineEndings">
+  <properties>
+   <property name="eolChar" value="\n"/>
+  </properties>
+ </rule>
+
+
+
+</ruleset>
+
