@@ -2,4 +2,23 @@
 <?php
 exec('rm '.__DIR__.'/../html/* 2>&1');
 chdir(__DIR__.'/../test');
+echo "----------------------------------------\n".
+     "Start PHPUnit testing\n".
+     "----------------------------------------\n";
 passthru('phpunit --configuration config.xml --verbose');
+echo "----------------------------------------\n".
+     "End PHPUnit testing\n".
+     "----------------------------------------\n".
+     "Start PHP_CodeSniffer testing\n".
+     "----------------------------------------\n";
+
+passthru('phpcs --standard=phpcs.config.xml --report=full ../lib');
+echo "----------------------------------------\n".
+     "End PHP_CodeSniffer testing\n".
+     "----------------------------------------\n".
+     "Start PHPMD testing\n".
+     "----------------------------------------\n";
+passthru('phpmd ../lib text naming,design,unusedcode');
+echo "----------------------------------------\n".
+     "End PHPMD testing\n".
+     "----------------------------------------\n";
