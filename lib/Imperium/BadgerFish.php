@@ -1,25 +1,43 @@
 <?php
-/* 
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * BadgerFish Transformations and Addressing
+ *
+ * PHP version 5.3
+ *
+ * @category Imperium
+ * @package  Imperium\BadgerFish
+ * @author   Joby Walker <joby@imperium.org>
+ * @license  http://www.opensource.org/licenses/mit-license.php MIT
+ * @link     https://github.com/jobywalker/Imperium-BadgerFish
  */
 
 namespace Imperium;
 
+/**
+ * Class of static methods to perform BadgerFish transformations and work with the datastructure
+ *
+ * @category Imperium
+ * @package  Imperium\BadgerFish
+ * @author   Joby Walker <joby@imperium.org>
+ * @license  http://www.opensource.org/licenses/mit-license.php MIT
+ * @link     https://github.com/jobywalker/Imperium-BadgerFish
+ */
 class BadgerFish
 {
     /**
      * Convert an XML String into JSON serialization
+     *
      * @param string $xml XML String
      * @return string JSON Serialization
      */
     public static function xmlToJson($xml)
     {
-        return json_encode(self::XmlToPhp($xml));
+        return \json_encode(self::XmlToPhp($xml));
     }
 
     /**
      * Convert an XML String into a PHP datastructure
+     *
      * @param string $xml XML String
      * @return mixed PHP datastructure
      */
@@ -34,7 +52,8 @@ class BadgerFish
     
     /**
      * Convert a SimpleXML datastructure into a JSON serialization
-     * @param \SimpleXMLElement $sxe
+     *
+     * @param \SimpleXMLElement $sxe SimpleXMLElemnent to transform
      * @return string JSON Serialization
      */
     public static function simpleXmlToJson(\SimpleXMLElement $sxe)
@@ -44,7 +63,8 @@ class BadgerFish
 
     /**
      * Convert a SimpleXML datastructure into a PHP datastructure
-     * @param \SimpleXMLElement $sxe
+     *
+     * @param \SimpleXMLElement $sxe SimpleXMLElemnent to transform
      * @return mixed PHP datastructure
      */
     public static function simpleXmlToPhp(\SimpleXMLElement $sxe)
@@ -56,7 +76,8 @@ class BadgerFish
 
     /**
      * Perform BadgerFish transform on the supplied parameter
-     * @param mixed $data
+     *
+     * @param mixed $data Transform this
      * @return mixed
      */
     public static function badgerfy($data)
@@ -89,7 +110,7 @@ class BadgerFish
                 $return['$'] = self::badgerfy((string)$data);
             }
         } elseif (\is_object($data)) {
-            foreach((array)$data as $key => $value) {
+            foreach ((array)$data as $key => $value) {
                 $return[$key] = self::badgerfy($value);
             }
         } elseif (\is_array($data)) {
@@ -112,17 +133,19 @@ class BadgerFish
 
     /**
      * Convert JSON serialization into XML
-     * @param string $json
+     *
+     * @param string $json JSON string to transform
      * @return string
      */
     public static function jsonToXml($json)
     {
-        return self::phpToXml(json_decode($json, false));
+        return self::phpToXml(\json_decode($json, false));
     }
 
     /**
      * Convert a PHP datastructure into a Valid XML document
-     * @param mixed $php
+     *
+     * @param mixed $php PHP to transform
      * @return string
      */
     public static function phpToXml($php)
@@ -132,7 +155,8 @@ class BadgerFish
 
     /**
      * Convert a PHP datastructure into a SimpleXMLElement structure
-     * @param mixed $php
+     *
+     * @param mixed $php PHP to transform
      * @return SimpleXMLElement
      */
     public static function phpToSXE($php)
@@ -144,7 +168,12 @@ class BadgerFish
             throw new \Exception('Data is not properly formatted for generating XML root');
         }
         list($root) = \array_keys($php);
-        $sxe = \simplexml_load_string("<$root/>", 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NOERROR);
+        $content    = \is_object($php[$root]) ? (array)$php[$root]: $php[$root];
+        $rootXml    = isset($content['$']) ? "<$root>".$content['$']."</$root>" : "<$root/>";
+        $sxe = \simplexml_load_string(
+            $rootXml,
+            'SimpleXMLElement', LIBXML_NOCDATA|LIBXML_NOERROR
+        );
         if (!($sxe instanceof \SimpleXMLElement)) {
             throw new \Exception('Can not be created as XML');
         }
@@ -154,25 +183,29 @@ class BadgerFish
 
     /**
      * Recursively transform PHP datastructure into a SimpleXMLElement
-     * @param mixed $data
-     * @param \SimpleXMLElement $sxe
-     * @param mixed $field
+     *
+     * @param mixed             $data  Data to manipulate
+     * @param \SimpleXMLElement $sxe   SimpleXMLElement to add elements/attributes to
+     * @param mixed             $field Field name
+     * @return void
      */
     public static function debadger($data, \SimpleXMLElement $sxe, $field = null)
     {
-        if (\is_object($data) || (\is_array($data) && \array_keys($data) !== range(0,count($data)-1))) {
+        if (\is_object($data)
+            || (\is_array($data) && \array_keys($data) !== range(0, count($data)-1))
+        ) {
             $data = (array)$data;
             if ($field) {
-                if(isset($data['$'])) {
-                    $c = $sxe->addChild($field, $data['$']);
+                if (isset($data['$'])) {
+                    $child = $sxe->addChild($field, $data['$']);
                 } else {
-                    $c = $sxe->addChild($field);
+                    $child = $sxe->addChild($field);
                 }
             } else {
-                $c = $sxe;
+                $child = $sxe;
             }
-            foreach((array)$data as $key => $value) {
-                self::debadger($value, $c, $key);
+            foreach ((array)$data as $key => $value) {
+                self::debadger($value, $child, $key);
             }
         } elseif ($field == null) {
             throw new \Exception('Invalid processing');
@@ -193,13 +226,17 @@ class BadgerFish
 
     /**
      * Add the string value as a child or attribute of the SimpleXMLElement
-     * @param string $string
-     * @param \SimpleXMLElement $sxe
-     * @param string $field
+     *
+     * @param string            $string Value to add
+     * @param \SimpleXMLElement $sxe    SimpleXMLElement to add elements/attributes to
+     * @param string            $field  Field Name
+     * @return void
      */
     public static function addString($string, \SimpleXMLElement $sxe, $field)
     {
-        if (preg_match('/^@/', $field)) {
+        if ($field == '$') {
+            // do nothing
+        } elseif (preg_match('/^@/', $field)) {
             $sxe->addAttribute(\mb_substr($field, 1), $string);
         } else {
             if ($string) {
@@ -208,5 +245,53 @@ class BadgerFish
                 $sxe->addChild($field);
             }
         }
+    }
+
+
+    /**
+     * Retrieve the value at the specified path
+     *
+     * @param array  $badger BadgerFish data structure
+     * @param string $path   Path in . sparated notation
+     * @return mixed
+     */
+    public static function getValue($badger, $path)
+    {
+        $path = mb_split('\.', $path);
+        $max  = count($path)-1;
+        $value = $badger;
+        for ($x=0; $x<=$max; $x++) {
+            if (\is_object($value)) {
+                $value = (array)$value;
+            } elseif (!\is_array($value)) {
+                return null;
+            }
+            $value = isset($value[$path[$x]]) ? $value[$path[$x]] : null;
+        }
+        if (\is_array($value)||\is_object($value)) {
+            $test = \is_object($value) ? (array)$value : $value;
+            if (isset($test['$'])) {
+                return $test['$'];
+            }
+        }
+        return $value;
+    }
+
+    /**
+     * Retrieve an array (not assoc-array) at the specified path
+     * 
+     * @param array  $badger BadgerFish data structure
+     * @param string $path   Path in . sparated notation
+     * @return array
+     */
+    public static function getArray($badger, $path)
+    {
+        $value = self::getValue($badger, $path);
+        if ($value === null || $value === array()) {
+            return array();
+        } elseif (\is_array($value) && \array_keys($value) === range(0, count($value)-1)) {
+            return $value;
+        }
+        return array($value);
     }
 }
