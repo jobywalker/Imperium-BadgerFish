@@ -197,9 +197,9 @@ class BadgerFish
             $data = (array)$data;
             if ($field) {
                 if (isset($data['$'])) {
-                    $child = $sxe->addChild($field, $data['$']);
+                    $child = self::addString($data['$'], $sxe, $field);
                 } else {
-                    $child = $sxe->addChild($field);
+                    $child = self::addString(null, $sxe, $field);
                 }
             } else {
                 $child = $sxe;
@@ -230,7 +230,7 @@ class BadgerFish
      * @param string            $string Value to add
      * @param \SimpleXMLElement $sxe    SimpleXMLElement to add elements/attributes to
      * @param string            $field  Field Name
-     * @return void
+     * @return \SimpleXMLElement
      */
     public static function addString($string, \SimpleXMLElement $sxe, $field)
     {
@@ -240,9 +240,9 @@ class BadgerFish
             $sxe->addAttribute(\mb_substr($field, 1), $string);
         } else {
             if ($string) {
-                $sxe->addChild($field, $string);
+                return $sxe->addChild($field, preg_replace('/&(?!amp;)/u', '&amp;', $string));
             } else {
-                $sxe->addChild($field);
+                return $sxe->addChild($field);
             }
         }
     }
