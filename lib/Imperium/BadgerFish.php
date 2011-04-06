@@ -7,7 +7,7 @@
  * @category Imperium
  * @package  Imperium\BadgerFish
  * @author   Joby Walker <joby@imperium.org>
- * @license  http://www.opensource.org/licenses/mit-license.php MIT
+ * @license  http://unlicense.org/ UNLICENSE
  * @link     https://github.com/jobywalker/Imperium-BadgerFish
  */
 
@@ -19,7 +19,7 @@ namespace Imperium;
  * @category Imperium
  * @package  Imperium\BadgerFish
  * @author   Joby Walker <joby@imperium.org>
- * @license  http://www.opensource.org/licenses/mit-license.php MIT
+ * @license  http://unlicense.org/ UNLICENSE
  * @link     https://github.com/jobywalker/Imperium-BadgerFish
  */
 class BadgerFish
