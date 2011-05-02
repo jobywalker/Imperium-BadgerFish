@@ -32,6 +32,14 @@ class BadgerFishTest extends \PHPUnit_Framework_TestCase
         $json = '{"Billing":{"Model":"Managed Server (Billed)","ServerSize":2,"BillSet":{"BillTo":{"Id":1,"Budget":"14-0030","PCATask":"","PCAOption":"","PCAProject":"","Share":100}},"Items":{"Item":[{"Id":4,"TariffVendor":"Server & U","Units":2,"Monthly":true,"StartDate":"2011-01-01","EndDate":"2014-12-31"},{"Id":6,"TariffVendor":"Unix Hours","Units":3,"Monthly":false,"StartDate":"2011-02-24","EndDate":""},{"Id":1,"TariffVendor":"Unix Hours","Units":1,"Monthly":true,"StartDate":"2011-01-01","EndDate":"2014-12-31"},{"Id":2,"TariffVendor":"App Hours","Units":1,"Monthly":true,"StartDate":"2011-01-01","EndDate":"2014-12-31"},{"Id":5,"TariffVendor":"RedHat OS","Units":1,"Monthly":true,"StartDate":"2011-01-01","EndDate":"2014-12-31"},{"Id":3,"TariffVendor":"DBA Hours","Units":2,"Monthly":true,"StartDate":"2011-01-01","EndDate":"2014-12-31"}]}}}';
         Assert::equals($xml, BadgerFish::jsonToXml($json));
     }
+    
+    public function testJsonToXmlBlankArray()
+    {
+        $json = '{"Bob":{"Ps":{"P":[]}}}';
+        $xml  = '<?xml version="1.0"?>'."\n".'<Bob><Ps/></Bob>'."\n";
+        Assert::equals($xml, BadgerFish::jsonToXml($json));
+        
+    }
 
     public function testJsonToXmlWithAttr()
     {
