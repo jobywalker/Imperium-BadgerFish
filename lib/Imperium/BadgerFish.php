@@ -97,7 +97,11 @@ class BadgerFish
             if (count($children)) {
                 $counter = array();
                 foreach ($children as $name => $child) {
-                    $counter[$name]++;
+                    if (!isset($counter[$name])) {
+                        $counter[$name] = 1;
+                    } else {
+                        $counter[$name]++;
+                    }
                     if ($counter[$name]==1) {
                         $return[$name] = self::badgerfy($child);
                     } elseif ($counter[$name]==2) {
