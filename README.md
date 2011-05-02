@@ -1,5 +1,5 @@
 # \Imperium\BadgerFish
-### v1.1.0
+### v1.2.2
 
 A PHP Library to transform XML into JSON and JSON into XML following the [BadgerFish](http://ajaxian.com/archives/badgerfish-translating-xml-to-json) convention.
 

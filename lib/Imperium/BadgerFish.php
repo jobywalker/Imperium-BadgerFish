@@ -143,6 +143,17 @@ class BadgerFish
     }
 
     /**
+     * Convert JSON serialized content to PHP
+     * 
+     * @param string $json JSON Encoded content
+     * @return mixed PHP datastructure
+     */
+    public static function jsonToPhp($json)
+    {
+        return \json_decode($json, false);
+    }
+
+    /**
      * Convert a PHP datastructure into a Valid XML document
      *
      * @param mixed $php PHP to transform
@@ -191,7 +202,9 @@ class BadgerFish
      */
     public static function debadger($data, \SimpleXMLElement $sxe, $field = null)
     {
-        if (\is_object($data)
+        if (\is_array($data) && count($data)===0) {
+            return;
+        } elseif (\is_object($data)
             || (\is_array($data) && \array_keys($data) !== range(0, count($data)-1))
         ) {
             $data = (array)$data;
