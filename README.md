@@ -13,3 +13,5 @@ Usage:
     echo $json; # '{"Root":{"Children":{"Child":[{"Order":1,"Name":"John Doe","Awesome":false},{"Order":2,"Name":"Jane Doe","Awesome":true}]}}}'
 
     echo BadgerFish::jsonToXML($json);
+
+Joby Walker
